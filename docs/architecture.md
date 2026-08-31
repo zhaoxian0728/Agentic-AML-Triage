@@ -53,9 +53,10 @@ are used only where judgment is actually required.
   (None) given how PaySim generates account IDs -- expected, not a bug
 
 ## Tech Stack
-- Model: Claude Haiku (Detector-adjacent/fast tasks) + Claude Sonnet
-  (Investigation Agent), via AWS Bedrock
-- Orchestration: LangGraph (nodes, conditional edges)
+- Model: Claude Sonnet (Investigation Agent's reasoning loop) + Claude Haiku (Explainer, Output Reviewer, and verdict-structuring steps), via AWS Bedrock. 
+  Detector uses no model — it's plain code.
+- Tools & model interface: LangChain (@tool decorator, ChatBedrock via langchain-aws)
+- Orchestration: LangGraph (nodes, conditional edges, built on top of LangChain's pieces)
 - Schema: Pydantic (typed state + verdicts)
 - Evaluation: LangSmith (tracing + dataset experiments)
 - Guardrails: iteration cap (5), 1-rewrite cap, allowed_tools allow-list
