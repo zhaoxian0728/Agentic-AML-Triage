@@ -1,0 +1,28 @@
+from langchain_aws import ChatBedrock
+from src.schemas import InvestigationVerdict, ExplainerOutput
+
+EXPLAINER_PROMPT = """You are drafting a brief narrative for a bank AML investigator,
+based on a completed investigation. Use hedged, non-accusatory language — say
+"activity is consistent with known mule patterns," never "this is money
+laundering" or other definitive accusations. This mirrors how real Suspicious
+Activity Reports must be worded for legal reasons.
+
+Keep it to 2-4 sentences. Reference only the specific evidence provided —
+never invent details not present in the evidence list.
+"""
+
+
+def explain(verdict: InvestigationVerdict) -> ExplainerOutput:
+    model = ChatBedrock(
+        model_id="anthropic.claude-3-5-haiku-20241022-v1:0",
+        region_name="ap-southeast-1",
+    ).with_structured_output(ExplainerOutput)
+
+    evidence_text = "\n".join(f"- {e}" for e in verdict.evidence)
+    prompt = (
+        f"{EXPLAINER_PROMPT}\n\nAccount: {verdict.account_id}\n"
+        f"Confidence: {verdict.confidence}\nEvidence:\n{evidence_text}"
+    )
+    result = model.invoke(prompt)
+    result.account_id = verdict.account_id
+    return result
