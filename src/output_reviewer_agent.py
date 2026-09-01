@@ -1,4 +1,8 @@
+import os
+from dotenv import load_dotenv
+load_dotenv()
 from langchain_aws import ChatBedrock
+from langchain_openai import ChatOpenAI
 from src.schemas import ExplainerOutput, InvestigationVerdict, OutputReviewerVerdict
 
 REVIEWER_PROMPT = """Review this narrative before it reaches a human AML investigator.
@@ -14,9 +18,9 @@ only the presentation.
 
 
 def review_output(narrative: ExplainerOutput, verdict: InvestigationVerdict) -> OutputReviewerVerdict:
-    model = ChatBedrock(
-        model_id="anthropic.claude-3-5-haiku-20241022-v1:0",
-        region_name="ap-southeast-1",
+    model = ChatOpenAI(
+        model="gpt-4o",
+        api_key=os.getenv("OPENAI_API_KEY"),
     ).with_structured_output(OutputReviewerVerdict)
 
     prompt = f"{REVIEWER_PROMPT}\n\nConfidence score: {verdict.confidence}\nNarrative:\n{narrative.narrative}"

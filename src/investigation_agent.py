@@ -1,6 +1,10 @@
+import os
+from dotenv import load_dotenv
+load_dotenv()
 import pandas as pd
 from langchain_core.tools import tool
 from langchain_aws import ChatBedrock
+from langchain_openai import ChatOpenAI
 from langgraph.prebuilt import create_react_agent
 from src.tools import get_account_history, check_velocity, check_linked_accounts
 from src.schemas import InvestigationVerdict
@@ -17,12 +21,33 @@ Important context about this data, learned from real analysis of this dataset:
 - check_velocity_tool will often return no data (None) — this is expected
   given how this dataset is structured, and should NOT itself be treated as
   suspicious or as evidence of innocence. Weigh whatever evidence you do have.
-- check_linked_accounts_tool is your strongest signal: an account receiving
-  from 2 or more OTHER accounts that are already flagged is a strong
-  indicator of a mule collection point (a "fan-in" pattern).
+- check_linked_accounts_tool: a real but moderate signal. Fraudulent accounts
+  are roughly 3x more likely to show 2+ flagged connections than legitimate
+  ones (about 56% vs 15% in our validation data) — meaningful, but on its
+  own, roughly 1 in 5 flagged connections belongs to an innocent account.
+  Don't treat a fan-in match alone as confirmation — weigh it together with
+  account history and velocity, and reserve high confidence for cases with
+  multiple corroborating signals, not this one alone.
 - check_account_history_tool tells you if this account has a track record
   or is a fresh/one-off account — fresh accounts with no history are more
   typical of mule accounts.
+
+Important: use fan_in_ratio, not the raw count of linked accounts, as your
+primary signal. Raw count is misleading — it's driven mostly by how many
+total transactions an account receives, not by suspicion. Since roughly
+half of all senders in this dataset are flagged accounts, an entirely
+innocent, high-volume account will often show a fan_in_ratio around
+0.5-0.6 purely by chance — that is NOT strong evidence on its own.
+
+Examples of correct judgment:
+- fan_in_ratio of 1.0 (ALL incoming transactions from flagged senders),
+  especially on a fresh account with few total transactions → this is
+  genuinely rare and meaningful. Escalate, high confidence.
+- fan_in_ratio around 0.5-0.7 on an account with many total incoming
+  transactions → likely close to chance level, not strong evidence by
+  itself. Lean toward false_alarm unless another signal corroborates it.
+- fan_in_ratio below 0.3, or very few flagged connections relative to
+  total volume → false_alarm, this is normal background noise.
 
 Every claim in your final conclusion must cite a specific piece of evidence
 you gathered — never assert something you didn't check. When you have enough
@@ -51,9 +76,9 @@ def build_investigation_agent(df: pd.DataFrame, flagged_ids: set[str]):
         """Check how quickly money moved in and out of this account."""
         return check_velocity(account_id, df).model_dump_json()
 
-    model = ChatBedrock(
-        model_id="anthropic.claude-3-5-sonnet-20241022-v2:0",
-        region_name="ap-southeast-1",
+    model = ChatOpenAI(
+        model="gpt-4o",
+        api_key=os.getenv("OPENAI_API_KEY"),
     )
 
     return create_react_agent(
@@ -72,9 +97,9 @@ def investigate_account(agent, account_id: str) -> InvestigationVerdict:
     final_text = result["messages"][-1].content
 
     # Second pass: force the freeform conclusion into your locked schema
-    extractor = ChatBedrock(
-        model_id="anthropic.claude-3-5-haiku-20241022-v1:0",
-        region_name="ap-southeast-1",
+    extractor = ChatOpenAI(
+        model="gpt-4o",
+        api_key=os.getenv("OPENAI_API_KEY"),
     ).with_structured_output(InvestigationVerdict)
 
     return extractor.invoke(

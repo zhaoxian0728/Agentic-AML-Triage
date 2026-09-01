@@ -14,6 +14,8 @@ class LinkedAccounts(BaseModel):
     account_id: str
     linked_flagged_accounts: list[str]
     linked_count: int
+    total_incoming_count: int
+    fan_in_ratio: float
 
 
 class VelocityResult(BaseModel):
@@ -39,15 +41,19 @@ def get_account_history(account_id: str, df: pd.DataFrame) -> AccountHistory:
 
 
 def check_linked_accounts(account_id: str, df: pd.DataFrame, flagged_ids: set[str]) -> LinkedAccounts:
-    """Find flagged accounts that SENT money to this one — receiving from
-    flagged accounts is the real mule signal (58.5% fraud rate), sending
-    to them showed 0% correlation in our validation, so only the
-    receiving direction is counted now."""
-    received_from = set(df[df["nameDest"] == account_id]["nameOrig"]) & flagged_ids
+    """Ratio of incoming transactions from flagged senders, not raw count —
+    raw count is confounded with how many total transactions an account
+    receives, which misleads toward flagging busy legitimate accounts and
+    clearing fresh low-volume fraud accounts."""
+    incoming = df[df["nameDest"] == account_id]
+    total_incoming = len(incoming)
+    received_from = set(incoming["nameOrig"]) & flagged_ids
     return LinkedAccounts(
         account_id=account_id,
         linked_flagged_accounts=list(received_from),
         linked_count=len(received_from),
+        total_incoming_count=total_incoming,
+        fan_in_ratio=len(received_from) / total_incoming if total_incoming > 0 else 0.0,
     ) 
 
 

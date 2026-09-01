@@ -3,7 +3,8 @@ from sklearn.metrics import precision_score, recall_score, f1_score
 from src.features import engineer_features
 from src.detector import score_transaction
 
-df = pd.read_csv("data/paysim_sample.csv")
+# df = pd.read_csv("data/paysim_sample.csv")
+df = pd.read_csv("data/PS_20174392719_1491204439457_log.csv")
 df = engineer_features(df)
 df["score"] = df.apply(score_transaction, axis=1)
 
