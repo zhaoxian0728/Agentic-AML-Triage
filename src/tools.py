@@ -39,16 +39,16 @@ def get_account_history(account_id: str, df: pd.DataFrame) -> AccountHistory:
 
 
 def check_linked_accounts(account_id: str, df: pd.DataFrame, flagged_ids: set[str]) -> LinkedAccounts:
-    """Find other flagged accounts this one sent money to or received from —
-    the basis for spotting a mule ring, not just a single account."""
-    sent_to = set(df[df["nameOrig"] == account_id]["nameDest"])
-    received_from = set(df[df["nameDest"] == account_id]["nameOrig"])
-    connected = (sent_to | received_from) & flagged_ids
+    """Find flagged accounts that SENT money to this one — receiving from
+    flagged accounts is the real mule signal (58.5% fraud rate), sending
+    to them showed 0% correlation in our validation, so only the
+    receiving direction is counted now."""
+    received_from = set(df[df["nameDest"] == account_id]["nameOrig"]) & flagged_ids
     return LinkedAccounts(
         account_id=account_id,
-        linked_flagged_accounts=list(connected),
-        linked_count=len(connected),
-    )
+        linked_flagged_accounts=list(received_from),
+        linked_count=len(received_from),
+    ) 
 
 
 def check_velocity(account_id: str, df: pd.DataFrame) -> VelocityResult:
