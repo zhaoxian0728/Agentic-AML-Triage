@@ -3,7 +3,8 @@
 ## Problem
 A junior AML Investigations Analyst at a bank needs a fast, explainable way
 to tell which flagged accounts show genuine money-mule behavior, because
-90-98% of AML alerts are false positives requiring full manual review.
+90-95% of AML alerts are false positives requiring full manual review
+(PricewaterhouseCoopers; peer-reviewed industry analysis, ScienceDirect 2024).
 
 ## Pipeline
 PaySim transactions -> Detector (plain code, not an agent) ->
@@ -89,7 +90,8 @@ are used only where judgment is actually required.
 - Held-out sample (never used for calibration): 40% recall, 53% precision
 - Tuned sample (used for prompt calibration): 75% recall, 50% precision
 - Naive baseline comparison (isFlaggedFraud rule): 0.19% recall
-- Real-world AML industry benchmark: 2-10% precision
+- Real-world AML industry benchmark: 5-10% precision (see Benchmarking
+  section below for sources)
 
 Both results far exceed the naive baseline and sit well above real-world
 industry precision benchmarks, evaluated on genuinely unseen data
