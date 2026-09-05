@@ -4,11 +4,10 @@ load_dotenv()
 import pandas as pd
 from langchain_core.tools import tool
 from langchain_aws import ChatBedrock
-from langchain_openai import ChatOpenAI
+# from langchain_openai import ChatOpenAI
 from langgraph.prebuilt import create_react_agent
 from src.tools import get_account_history, check_velocity, check_linked_accounts
 from src.schemas import InvestigationVerdict
-
 SYSTEM_PROMPT = """You are assisting an AML investigator by examining an account
 that received funds from a transaction flagged as a possible money-mule case.
 
@@ -28,9 +27,14 @@ Important context about this data, learned from real analysis of this dataset:
   Don't treat a fan-in match alone as confirmation — weigh it together with
   account history and velocity, and reserve high confidence for cases with
   multiple corroborating signals, not this one alone.
-- check_account_history_tool tells you if this account has a track record
-  or is a fresh/one-off account — fresh accounts with no history are more
-  typical of mule accounts.
+- check_account_history_tool tells you if this account had any activity
+  (sending OR receiving) before the transaction under investigation.
+  Validated on this dataset: legitimate accounts are much MORE likely to
+  show prior history than fraud accounts (73.5% vs 40%) — a fresh account
+  with NO prior activity is a real, moderate signal TOWARD suspicion, not
+  against it, consistent with mule accounts often being created for
+  one-time use. This is a moderate signal, not decisive alone — a
+  meaningful share of both fraud and legit accounts fall on each side.
 
 Important: use fan_in_ratio, not the raw count of linked accounts, as your
 primary signal. Raw count is misleading — it's driven mostly by how many
@@ -53,6 +57,16 @@ Every claim in your final conclusion must cite a specific piece of evidence
 you gathered — never assert something you didn't check. When you have enough
 evidence, give a clear final verdict: is this account confirmed as showing
 mule behavior, or is it a false alarm? State your confidence and reasoning.
+
+- Critical: fan_in_ratio is unreliable at very low transaction volume
+  (total_incoming_count of 1-2) — a ratio of 1.0 occurs roughly as often
+  on legitimate accounts as on fraud accounts by pure chance at this
+  volume. Do NOT treat it as strong evidence in either direction. Instead,
+  actively weigh other available evidence (account history, velocity, any
+  additional context) to break the tie — do not default toward
+  false_alarm OR escalate based on the ratio alone at this volume. If no
+  other evidence is available, moderate confidence (not high, not
+  automatically low) reflects genuine uncertainty.
 """
 
 
@@ -61,10 +75,12 @@ def build_investigation_agent(df: pd.DataFrame, flagged_ids: set[str]):
     via closures — this is how account_id-only tool calls still have access
     to the full dataframe without the LLM ever seeing it directly."""
 
+    context = {"before_step": None}
+
     @tool
     def check_account_history_tool(account_id: str) -> str:
         """Look up an account's transaction history and typical behavior."""
-        return get_account_history(account_id, df).model_dump_json()
+        return get_account_history(account_id, df, before_step=context["before_step"]).model_dump_json()
 
     @tool
     def check_linked_accounts_tool(account_id: str) -> str:
@@ -76,20 +92,26 @@ def build_investigation_agent(df: pd.DataFrame, flagged_ids: set[str]):
         """Check how quickly money moved in and out of this account."""
         return check_velocity(account_id, df).model_dump_json()
 
-    model = ChatOpenAI(
-        model="gpt-4o",
-        api_key=os.getenv("OPENAI_API_KEY"),
+    model = ChatBedrock(
+        model_id="us.anthropic.claude-sonnet-4-5-20250929-v1:0",
+        region_name=os.getenv("AWS_REGION"),
     )
 
-    return create_react_agent(
+    agent = create_react_agent(
         model=model,
         tools=[check_account_history_tool, check_linked_accounts_tool, check_velocity_tool],
         prompt=SYSTEM_PROMPT,
     )
+    return agent, context
 
 
-def investigate_account(agent, account_id: str) -> InvestigationVerdict:
-    """Run the reasoning loop on one account, then extract a structured verdict."""
+def investigate_account(agent_and_context, account_id: str, before_step: float | None = None) -> InvestigationVerdict:
+    """Run the reasoning loop on one account, then extract a structured verdict.
+    `before_step` (the step of the transaction that triggered this investigation)
+    is threaded into check_account_history_tool via the shared context dict, so
+    it can exclude the triggering transaction itself from "history"."""
+    agent, context = agent_and_context
+    context["before_step"] = before_step
     result = agent.invoke(
         {"messages": [("user", f"Investigate account {account_id}.")]},
         config={"recursion_limit": 12},  # ~5 reason+tool round trips, capped
@@ -97,9 +119,9 @@ def investigate_account(agent, account_id: str) -> InvestigationVerdict:
     final_text = result["messages"][-1].content
 
     # Second pass: force the freeform conclusion into your locked schema
-    extractor = ChatOpenAI(
-        model="gpt-4o",
-        api_key=os.getenv("OPENAI_API_KEY"),
+    extractor = ChatBedrock(
+        model_id="us.anthropic.claude-sonnet-4-5-20250929-v1:0",
+        region_name=os.getenv("AWS_REGION"),
     ).with_structured_output(InvestigationVerdict)
 
     return extractor.invoke(
