@@ -13,7 +13,7 @@ flagged_ids = set(df[df["score"] >= 0.3]["nameOrig"])
 batch = df[df["score"] >= 0.3].sample(n=5, random_state=1)
 
 
-def fake_investigate_account(agent, account_id):
+def fake_investigate_account(agent, account_id, before_step=None):
     return InvestigationVerdict(
         account_id=account_id, confirmed=True, confidence=0.8,
         evidence=["stub: received from 2 flagged accounts"],

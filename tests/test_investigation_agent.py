@@ -13,7 +13,7 @@ agent = build_investigation_agent(df, flagged_ids)
 fraud_transfer = df[(df["isFraud"] == 1) & (df["type"] == "TRANSFER")].iloc[0]
 recipient = fraud_transfer["nameDest"]
 
-verdict = investigate_account(agent, recipient)
+verdict = investigate_account(agent, recipient, before_step=fraud_transfer["step"])
 print("\n" + "=" * 50)
 print(f"Account:     {verdict.account_id}")
 print(f"Confirmed:   {verdict.confirmed}")
