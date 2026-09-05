@@ -20,3 +20,5 @@ def assign_ranks(scored_accounts: list[tuple[str, float]]) -> list[PriorityRank]
         PriorityRank(account_id=acc_id, urgency_score=score, rank=i + 1)
         for i, (acc_id, score) in enumerate(ordered)
     ]
+
+    

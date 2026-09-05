@@ -20,7 +20,7 @@ def score_transaction(row: pd.Series) -> float:
         score += 0.2
     return min(score, 1.0)
 
-    
+
 def route(score: float, threshold: float = 0.3) -> str:
     return "investigate" if score >= threshold else "auto_close"
 

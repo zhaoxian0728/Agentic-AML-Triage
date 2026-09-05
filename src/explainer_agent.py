@@ -2,7 +2,7 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 from langchain_aws import ChatBedrock
-from langchain_openai import ChatOpenAI
+# from langchain_openai import ChatOpenAI
 from src.schemas import InvestigationVerdict, ExplainerOutput
 
 EXPLAINER_PROMPT = """You are drafting a brief narrative for a bank AML investigator,
@@ -17,9 +17,9 @@ never invent details not present in the evidence list.
 
 
 def explain(verdict: InvestigationVerdict) -> ExplainerOutput:
-    model = ChatOpenAI(
-        model="gpt-4o",
-        api_key=os.getenv("OPENAI_API_KEY"),
+    model = ChatBedrock(
+        model_id="us.anthropic.claude-sonnet-4-5-20250929-v1:0",
+        region_name=os.getenv("AWS_REGION"),
     ).with_structured_output(ExplainerOutput)
 
     evidence_text = "\n".join(f"- {e}" for e in verdict.evidence)

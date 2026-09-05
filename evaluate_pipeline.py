@@ -13,8 +13,8 @@ flagged_ids = set(df[df["score"] >= 0.3]["nameOrig"])
 # Detector into flagging them, so we're actually testing whether the
 # Investigation Agent can correctly clear a false positive, not just
 # easy cases that never reach it.
-fraud_sample = df[df["isFraud"] == 1].sample(n=20, random_state=2)
-hard_legit_sample = df[(df["isFraud"] == 0) & (df["score"] >= 0.3)].sample(n=20, random_state=2)
+fraud_sample = df[df["isFraud"] == 1].sample(n=20, random_state=3)
+hard_legit_sample = df[(df["isFraud"] == 0) & (df["score"] >= 0.3)].sample(n=20, random_state=3)
 test_batch = pd.concat([fraud_sample, hard_legit_sample])
 
 agent = build_investigation_agent(df, flagged_ids)

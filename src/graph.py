@@ -34,7 +34,9 @@ def build_graph(df: pd.DataFrame, flagged_ids: set[str], investigation_agent):
         return {"detector_verdict": verdict}
 
     def investigation_node(state):
-        verdict = investigate_account(investigation_agent, state["recipient_id"])
+        verdict = investigate_account(
+            investigation_agent, state["recipient_id"], before_step=state["transaction"]["step"]
+        )
         return {"investigation_verdict": verdict}
 
     def prioritization_node(state):
