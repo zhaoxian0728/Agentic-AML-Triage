@@ -1,0 +1,383 @@
+/* App text */
+.stApp {
+    color: var(--text-primary);
+}
+
+.stMarkdown p {
+    font-size: var(--text-base);
+    line-height: var(--leading-normal);
+    color: var(--text-primary);
+}
+
+/* Do not override Streamlit's icon font */
+.material-symbols-rounded,
+.material-symbols-outlined {
+    font-family: "Material Symbols Rounded",
+                 "Material Symbols Outlined" !important;
+    font-weight: normal !important;
+    font-style: normal !important;
+}
+
+/* Global Canvas */
+.stApp {
+    background-color: var(--bg-app) !important;
+    color: var(--text-primary) !important;
+}
+
+/* Hide Default Streamlit Chrome */
+#MainMenu { visibility: hidden; }
+footer { visibility: hidden; }
+
+header[data-testid="stHeader"] {
+    background: transparent !important;
+}
+
+/* Sidebar Styling */
+section[data-testid="stSidebar"] {
+    background-color: var(--bg-sidebar) !important;
+    border-right: 1px solid var(--border-subtle) !important;
+    box-shadow: var(--shadow-card) !important;
+    padding-top: var(--space-4);
+}
+
+section[data-testid="stSidebar"] .stMarkdown h2,
+section[data-testid="stSidebar"] .stMarkdown h3 {
+    color: var(--text-primary) !important;
+    font-size: var(--text-lg) !important;
+    font-weight: var(--weight-semibold) !important;
+    letter-spacing: -0.02em !important;
+}
+
+section[data-testid="stSidebar"] .stMarkdown p {
+    font-size: var(--text-sm) !important;
+    font-weight: var(--weight-regular) !important;
+    line-height: var(--leading-relaxed);
+    color: var(--text-secondary) !important;
+}
+
+section[data-testid="stSidebar"]
+div[data-testid="stFileUploader"] label p {
+    font-size: var(--text-sm) !important;
+    font-weight: var(--weight-medium) !important;
+    color: var(--text-primary) !important;
+}
+
+section[data-testid="stSidebar"]
+div[data-testid="stFileUploader"] p {
+    font-size: var(--text-xs) !important;
+    font-weight: var(--weight-regular) !important;
+    color: var(--text-muted) !important;
+}
+
+section[data-testid="stSidebar"]
+.stButton > button p {
+    font-size: var(--text-sm) !important;
+    font-weight: var(--weight-semibold) !important;
+}
+
+/* Main Container Padding */
+.main .block-container {
+    padding-top: var(--space-6) !important;
+    padding-bottom: var(--space-9) !important;
+    max-width: 1400px !important;
+}
+
+/* Header Container */
+.dash-header {
+    background: transparent;
+    padding: 0.5rem 0 1.1rem 0;
+    margin: 0;
+    border: none;
+    box-shadow: none;
+}
+
+.dash-title {
+    color: var(--text-primary);
+    font-size: var(--text-3xl);
+    font-weight: var(--weight-semibold);
+    line-height: var(--leading-tight);
+    margin: 0;
+    letter-spacing: -0.03em;
+}
+
+.dash-subtitle {
+    color: var(--text-secondary);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-regular);
+    line-height: var(--leading-normal);
+    margin-top: var(--space-2);
+}
+
+.header-divider {
+    height: 1px;
+    background: var(--border-subtle);
+    margin-bottom: var(--space-6);
+}
+
+/* Card Panels */
+.dash-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    padding: var(--space-6);
+    box-shadow: var(--shadow-card);
+}
+
+.dash-card-title {
+    font-size: var(--text-lg);
+    font-weight: var(--weight-semibold);
+    line-height: var(--leading-tight);
+    color: var(--text-primary);
+    margin-bottom: var(--space-4);
+    letter-spacing: -0.02em;
+}
+
+/* Custom KPI Cards */
+.kpi-container {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.kpi-card {
+    flex: 1;
+    background: var(--primary-soft);
+
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: var(--space-6);
+    box-shadow: var(--shadow-card);
+
+    transition:
+        transform 0.15s ease,
+        box-shadow 0.15s ease,
+        border-color 0.15s ease;
+}
+
+.kpi-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-hover);
+    border-color: var(--primary);
+}
+
+.kpi-label {
+    margin-bottom: var(--space-2);
+    font-size: var(--text-xs);
+    font-weight: var(--weight-medium);
+    line-height: var(--leading-normal);
+    color: var(--text-secondary);
+    letter-spacing: 0.02em;
+}
+
+.kpi-value {
+    font-size: var(--text-3xl);
+    font-weight: var(--weight-semibold);
+    line-height: var(--leading-tight);
+    color: var(--text-primary);
+    letter-spacing: -0.035em;
+}
+
+.kpi-subtext {
+    margin-top: var(--space-2);
+    font-size: var(--text-xs);
+    font-weight: var(--weight-regular);
+    line-height: var(--leading-normal);
+    color: var(--primary-hover);
+}
+
+.kpi-subtext--success {
+    color: var(--success);
+}
+
+.kpi-subtext--danger {
+    color: var(--danger);
+}
+
+/* Case Inspector Board */
+.case-board {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    padding: var(--space-7);
+    box-shadow: var(--shadow-card);
+}
+
+.case-header {
+    margin-bottom: var(--space-6);
+}
+
+.case-eyebrow {
+    font-size: var(--text-xs);
+    font-weight: var(--weight-semibold);
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+}
+
+.case-account {
+    margin-top: var(--space-1);
+    font-size: var(--text-3xl);
+    font-weight: var(--weight-semibold);
+    line-height: var(--leading-tight);
+    letter-spacing: -0.03em;
+    color: var(--text-primary);
+}
+
+.case-divider {
+    height: 1px;
+    background: var(--border-subtle);
+    margin-bottom: var(--space-6);
+}
+
+.case-info-card {
+    background: var(--bg-muted);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: var(--space-5);
+}
+
+.case-info-label {
+    font-size: var(--text-xs);
+    font-weight: var(--weight-medium);
+    color: var(--text-secondary);
+}
+
+.case-info-value {
+    margin-top: var(--space-2);
+    font-size: var(--text-2xl);
+    font-weight: var(--weight-semibold);
+    line-height: var(--leading-tight);
+    color: var(--primary);
+    letter-spacing: -0.025em;
+}
+
+/* Custom Evidence Item */
+.case-section-title {
+    margin-top: var(--space-6);
+    margin-bottom: var(--space-3);
+    font-size: var(--text-base);
+    font-weight: var(--weight-semibold);
+    color: var(--text-secondary);
+}
+
+.narrative-box,
+.evidence-card {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+    background: var(--bg-muted);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    padding: var(--space-3) var(--space-4);
+    margin-bottom: var(--space-2);
+    font-size: var(--text-sm);
+}
+
+.evidence-dot {
+    flex: 0 0 6px;
+    width: 6px;
+    height: 6px;
+    margin-top: 0.45rem;
+    border-radius: 50%;
+    background: var(--primary);
+}
+
+.evidence-text {
+    font-size: var(--text-sm);
+    font-weight: var(--weight-regular);
+    line-height: var(--leading-normal);
+    color: var(--text-primary);
+}
+
+.evidence-item {
+    background: var(--primary-pale);
+    border-left: 3px solid var(--primary);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    padding: var(--space-3) var(--space-4);
+    margin-bottom: var(--space-2);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-regular);
+    line-height: var(--leading-normal);
+    color: var(--text-primary);
+}
+
+/* Primary Action Buttons */
+.stButton > button {
+    background: var(--primary) !important;
+    color: var(--bg-card) !important;
+    border: 1px solid var(--primary) !important;
+    border-radius: var(--radius-md) !important;
+    padding: var(--space-3) var(--space-4) !important;
+    font-size: var(--text-sm) !important;
+    font-weight: var(--weight-semibold) !important;
+    box-shadow: none !important;
+    transition:
+        background 0.15s ease,
+        border-color 0.15s ease,
+        transform 0.15s ease;
+}
+
+.stButton > button:hover {
+    background: var(--primary-hover) !important;
+    border-color: var(--primary-hover) !important;
+}
+
+/* Form Inputs & Uploaders */
+div[data-testid="stFileUploader"] {
+    background: var(--bg-muted);
+    border: 1px dashed var(--border);
+    border-radius: var(--radius-md);
+    padding: var(--space-2);
+}
+
+/* Streamlit Dataframe Restyling */
+div[data-testid="stDataFrame"] {
+    background: var(--bg-card);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+}
+
+/* Expanders */
+.stExpander {
+    background: var(--bg-card) !important;
+    border: 1px solid var(--border-subtle) !important;
+    border-radius: var(--radius-md) !important;
+    box-shadow: none !important;
+}
+
+/* Empty State */ 
+.empty-state {
+    text-align: center;
+    padding: var(--space-9) var(--space-6);
+}
+
+.empty-state-title {
+    font-size: var(--text-lg);
+    font-weight: var(--weight-medium);
+    line-height: var(--leading-tight);
+    color: var(--text-primary);
+}
+
+.empty-state-description {
+    margin-top: var(--space-2);
+    font-size: var(--text-sm);
+    font-weight: var(--weight-regular);
+    line-height: var(--leading-normal);
+    color: var(--text-muted);
+}
+
+/* Success Toast */
+div[data-testid="stToast"] {
+    background: var(--success-bg) !important;
+    border: 1px solid var(--success) !important;
+    border-radius: var(--radius-md) !important;
+    padding: var(--space-3) var(--space-4) !important;
+    box-shadow: var(--shadow-card) !important;
+}
+
+div[data-testid="stToast"] p {
+    font-size: var(--text-sm) !important;
+    font-weight: var(--weight-regular) !important;
+    line-height: var(--leading-normal) !important;
+    color: var(--text-primary) !important;
+}
