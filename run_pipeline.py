@@ -18,14 +18,14 @@ graph = build_graph(df, flagged_ids, agent)
 
 results = []
 for _, row in batch.iterrows():
-    state = {
-        "transaction": row.to_dict(),
-        "recipient_id": row["nameDest"],
-        "rewrite_count": 0,
-    }
-    final_state = graph.invoke(state)
-    if final_state.get("urgency_score") is not None:
-        results.append((final_state["investigation_verdict"], final_state))
+    try:
+        state = {"transaction": row.to_dict(), "recipient_id": row["nameDest"], "rewrite_count": 0}
+        final_state = graph.invoke(state)
+        if final_state.get("urgency_score") is not None:
+            results.append((final_state["investigation_verdict"], final_state))
+    except Exception as e:
+        print(f"Skipped {row['nameDest']}: {e}")
+        continue
 
 ranked = assign_ranks([(fs["investigation_verdict"].account_id, fs["urgency_score"]) for _, fs in results])
 for rank in ranked:
