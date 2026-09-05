@@ -7,6 +7,7 @@ from src.detector import score_transaction, route as detector_route
 from src.investigation_agent import investigate_account
 from src.explainer_agent import explain
 from src.output_reviewer_agent import review_output
+from src.prioritization_agent import compute_urgency
 from src.tools import check_velocity, check_linked_accounts
 
 
@@ -44,9 +45,8 @@ def build_graph(df: pd.DataFrame, flagged_ids: set[str], investigation_agent):
         velocity = check_velocity(state["recipient_id"], df)
         linked = check_linked_accounts(state["recipient_id"], df, flagged_ids)
         v = state["investigation_verdict"]
-        score = v.confidence * 0.4 + min(row["amount"] / 500000, 1.0) * 0.3 \
-            + (0.2 if velocity.is_fast_cashout else 0.0) + min(linked.linked_count / 5, 1.0) * 0.1
-        return {"urgency_score": round(min(score, 1.0), 3)}
+        score = compute_urgency(v, row["amount"], velocity.is_fast_cashout, linked.fan_in_ratio)
+        return {"urgency_score": score}
 
     def explainer_node(state):
         return {"explainer_output": explain(state["investigation_verdict"])}
