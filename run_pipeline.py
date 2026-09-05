@@ -30,5 +30,6 @@ for _, row in batch.iterrows():
 ranked = assign_ranks([(fs["investigation_verdict"].account_id, fs["urgency_score"]) for _, fs in results])
 for rank in ranked:
     matching = next(fs for v, fs in results if v.account_id == rank.account_id)
-    print(f"#{rank.rank} | {rank.account_id} | urgency={rank.urgency_score} | "
+    reviewer_action = matching.get("reviewer_verdict").action if matching.get("reviewer_verdict") else "N/A"
+    print(f"#{rank.rank} | {rank.account_id} | urgency={rank.urgency_score} | reviewer={reviewer_action} | "
           f"{matching['explainer_output'].narrative}")
