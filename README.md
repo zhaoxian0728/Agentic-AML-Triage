@@ -21,7 +21,7 @@ narrative for tone and evidence before it goes out. See
 2. `python -m venv venv`
 3. Activate: `.\venv\Scripts\Activate.ps1` (Windows)
 4. `pip install -r requirements.txt`
-5. `cp .env.example .env`, then fill in your AWS and LangSmith credentials
+5. `cp .env.example .env`, then fill in your AWS credentials
 
 ## How to Run
 1. `python sample_data.py` — one-time: samples the full PaySim log down to
@@ -55,14 +55,16 @@ narrative for tone and evidence before it goes out. See
 - `src/investigation_agent.py` — Real agent: a ReAct loop that
   investigates a flagged recipient using the tools above, then extracts a
   structured verdict
-- `src/prioritization_agent.py` — Plain-code, deterministic urgency
-  scoring and batch-relative ranking of already-confirmed accounts
+- `src/prioritizer.py` — Plain-code, deterministic urgency scoring and
+  batch-relative ranking of already-confirmed accounts
 - `src/explainer_agent.py` — Real agent: drafts a brief, hedged narrative
   for the investigator, grounded only in gathered evidence
 - `src/output_reviewer_agent.py` — Real agent: final checklist and
   safe-wording gate before a narrative reaches a human
 - `src/graph.py` — LangGraph wiring that connects Detector → Investigation
-  → Prioritization → Explainer → Output Reviewer (with a capped rewrite loop)
+  → Prioritizer → Explainer → Output Reviewer (with a capped rewrite loop)
+- `app.py` — Streamlit dashboard providing an interactive interface on
+  top of the real pipeline
 
 ## Testing / Evaluation
 
@@ -72,7 +74,3 @@ This significantly exceeds the naive baseline rule (0.19% recall) and sits
 well above real-world AML precision benchmarks (5-10%, per PwC and
 peer-reviewed industry research). See `docs/architecture.md` for the full
 evaluation methodology.
-
-Both far exceed the naive baseline rule (0.19% recall) and sit well above
-real-world AML precision benchmarks (2-10%). See `docs/architecture.md`
-for the full evaluation methodology.

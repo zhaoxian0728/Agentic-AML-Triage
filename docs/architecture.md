@@ -35,16 +35,28 @@ excluding these three types costs zero recall, since fraud cannot occur
 in them by the simulator's own design.
 
 ## Pipeline
-PaySim transactions -> Detector (plain code, not an agent) ->
-  [low score] -> Auto-close
-  [med/high score] -> Investigation Agent (reasoning loop, investigates
-    the RECIPIENT of the flagged transaction, not the sender)
-    -> [false alarm] -> Close
-    -> [confirmed] -> Prioritizer (plain code) -> Explainer Agent
-    -> Output Reviewer Agent -> Investigator (ranked shortlist + narrative)
+
+```mermaid
+flowchart TD
+    A[PaySim transactions] --> B[Detector<br/>plain code, not an agent]
+    B -->|low score| C[Auto-close]
+    B -->|med/high score| D[Investigation Agent<br/>investigates the RECIPIENT,<br/>not the sender]
+    D -->|false alarm| E[Close]
+    D -->|confirmed| F[Prioritizer<br/>plain code]
+    F --> G[Explainer Agent]
+    G --> H[Output Reviewer Agent<br/>checks narrative wording,<br/>not the fraud verdict]
+    H -->|narrative passes| I[Investigator<br/>ranked shortlist + narrative]
+    H -->|needs rewrite, 1x max| G
+    H -->|rewrite still fails| K[Narrative flagged:<br/>needs human wording check]
+    K --> I
+```
 
 Output Reviewer can send the narrative back to the Explainer for
 ONE rewrite max, then flags for human review if still failing.
+
+Note: "human review" here refers to checking the narrative's wording and
+tone — the fraud verdict itself is decided earlier, by the Investigation
+Agent, and is never re-opened by the Output Reviewer.
 
 ## Key data finding: investigate the recipient, not the sender
 Analysis of PaySim showed money-mule accounts are defined by RECEIVING
@@ -103,20 +115,22 @@ are used only where judgment is actually required.
   (None) given how PaySim generates account IDs -- expected, not a bug.
 
 ## Tech Stack
-- Model: Claude Sonnet (Investigation Agent's reasoning loop) + Claude Haiku
-  (Explainer, Output Reviewer, and verdict-structuring steps), via AWS
-  Bedrock. Detector uses no model -- it's plain code.
+- Model: Claude Sonnet 4.5, via AWS Bedrock, used across all three real
+  agents (Investigation, Explainer, Output Reviewer) and the verdict-
+  structuring step. Detector and Prioritizer use no model -- both are
+  plain code.
 - Tools & model interface: LangChain (@tool decorator, ChatBedrock via
   langchain-aws)
 - Orchestration: LangGraph (nodes, conditional edges, built on top of
   LangChain's pieces)
 - Schema: Pydantic (typed state + verdicts)
-- Evaluation: LangSmith (tracing + dataset experiments)
+- Evaluation: Custom evaluation harness (evaluate_detector.py,
+  evaluate_pipeline.py, diagnose_pipeline.py) comparing predictions
+  against ground-truth labels against real PaySim data.
 - Guardrails: iteration cap (5), 1-rewrite cap, allowed_tools allow-list
 
 ## Final Evaluation Results
-- Held-out sample (never used for calibration): 40% recall, 53% precision
-- Tuned sample (used for prompt calibration): 75% recall, 50% precision
+- 40% recall, 53% precision (Held-out Sample)
 - Naive baseline comparison (isFlaggedFraud rule): 0.19% recall
 - Real-world AML industry benchmark: 5-10% precision (see Benchmarking
   section below for sources)
