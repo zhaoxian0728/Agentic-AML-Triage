@@ -66,7 +66,7 @@ narrative for tone and evidence before it goes out. See
 
 ## Testing / Evaluation
 
-- **Held-out data (never used for prompt calibration): 40% recall / 53% precision**
+- **40% recall / 53% precision (evaluated on held-out data)**
 
 This significantly exceeds the naive baseline rule (0.19% recall) and sits
 well above real-world AML precision benchmarks (5-10%, per PwC and
