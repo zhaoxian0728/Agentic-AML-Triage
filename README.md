@@ -3,7 +3,8 @@
 ## Overview
 A junior AML Investigations Analyst at a bank needs a fast, explainable way
 to tell which flagged accounts show genuine money-mule behavior, because
-90-98% of AML alerts are false positives requiring full manual review.
+90-95% of AML alerts are false positives requiring full manual review
+(PricewaterhouseCoopers; peer-reviewed industry analysis, ScienceDirect 2024).
 
 This is a multi-agent system that does the first-pass investigative work:
 a plain-code Detector screens PaySim transactions on `type` and `amount`,
@@ -64,8 +65,13 @@ narrative for tone and evidence before it goes out. See
   → Prioritization → Explainer → Output Reviewer (with a capped rewrite loop)
 
 ## Testing / Evaluation
-- **Held-out data:** 40% recall / 53% precision
-- **Tuned sample:** 75% recall / 50% precision
+
+- **40% recall / 53% precision (evaluated on held-out data)**
+
+This significantly exceeds the naive baseline rule (0.19% recall) and sits
+well above real-world AML precision benchmarks (5-10%, per PwC and
+peer-reviewed industry research). See `docs/architecture.md` for the full
+evaluation methodology.
 
 Both far exceed the naive baseline rule (0.19% recall) and sit well above
 real-world AML precision benchmarks (2-10%). See `docs/architecture.md`

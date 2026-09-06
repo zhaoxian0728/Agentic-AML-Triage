@@ -6,6 +6,34 @@ to tell which flagged accounts show genuine money-mule behavior, because
 90-95% of AML alerts are false positives requiring full manual review
 (PricewaterhouseCoopers; peer-reviewed industry analysis, ScienceDirect 2024).
 
+## About the Dataset
+This system is built and evaluated on **PaySim**, a synthetic mobile-money
+transaction dataset (Kaggle: ealaxi/paysim1). PaySim simulates one month
+(744 hourly "steps") of transactions, generated from real transaction
+patterns of a mobile money service operating in an African country, with
+synthetic fraud injected for research use -- real financial data cannot
+be shared publicly for privacy reasons, so this kind of simulation is
+standard practice in fraud-detection research.
+
+**Currency is deliberately unspecified.** PaySim's own documentation
+states amounts are in "local currency" without naming which country or
+currency. This is a genuine ambiguity in the source data, not an
+oversight on our part -- our thresholds ($200,000, $500,000) are
+expressed in the dataset's native units for internal comparison purposes
+(matching PaySim's own built-in naive rule threshold), not as a literal
+real-world dollar claim.
+
+**Why only TRANSFER and CASH_OUT are treated as possible fraud.**
+PaySim's documented fraud model is explicit: a fraudulent actor takes
+control of a victim's account, TRANSFERS the funds to another account,
+then CASH_OUTs to convert it to physical money and disappear. This is
+not our assumption -- it is confirmed empirically: across the entire
+6.3M-row dataset, zero fraud cases occur in PAYMENT, DEBIT, or CASH_IN
+transactions. This is why `features.py` and `detector.py` treat
+transaction type as a hard gate rather than a probabilistic signal --
+excluding these three types costs zero recall, since fraud cannot occur
+in them by the simulator's own design.
+
 ## Pipeline
 PaySim transactions -> Detector (plain code, not an agent) ->
   [low score] -> Auto-close
