@@ -3,7 +3,8 @@
 ## Overview
 A junior AML Investigations Analyst at a bank needs a fast, explainable way
 to tell which flagged accounts show genuine money-mule behavior, because
-90-98% of AML alerts are false positives requiring full manual review.
+90-95% of AML alerts are false positives requiring full manual review
+(PricewaterhouseCoopers; peer-reviewed industry analysis, ScienceDirect 2024).
 
 This is a multi-agent system that does the first-pass investigative work:
 a plain-code Detector screens PaySim transactions on `type` and `amount`,
