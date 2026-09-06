@@ -4,15 +4,15 @@ import pandas as pd
 from src.features import engineer_features
 from src.detector import score_transaction
 from src.investigation_agent import build_investigation_agent
-from prioritizer import assign_ranks
+from src.prioritizer import assign_ranks
 from src.graph import build_graph
 from src.schemas import DetectorVerdict, InvestigationVerdict, ExplainerOutput, OutputReviewerVerdict
 
 # Toggle to True to run UI tests without making live LLM API calls
-DEMO_MODE = False 
+DEMO_MODE = True
 
 # Page Configuration
-st.set_page_config(page_title="Agentic AML Triage", layout="wide", initial_sidebar_state="expanded")
+st.set_page_config(page_title="AM-LENS", layout="wide", initial_sidebar_state="expanded")
 
 # Load External CSS Stylesheet
 def load_css(file_name="styles.css"):
@@ -25,9 +25,9 @@ load_css("styles.css")
 # Header Bar 
 st.markdown("""
 <div class="dash-header">
-    <div class="dash-title">AML Triage Workstation</div>
+    <div class="dash-title">AM-LENS</div>
     <div class="dash-subtitle">
-        Automated fraud detection, agentic investigation, and case prioritization
+        AML triage workstation for automated fraud detection, agentic investigation, and case prioritization
     </div>
 </div>
 <div class="header-divider"></div>

@@ -7,7 +7,7 @@ from src.detector import score_transaction, route as detector_route
 from src.investigation_agent import investigate_account
 from src.explainer_agent import explain
 from src.output_reviewer_agent import review_output
-from prioritizer import compute_urgency
+from src.prioritizer import compute_urgency
 from src.tools import check_velocity, check_linked_accounts
 
 
