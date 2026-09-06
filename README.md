@@ -65,8 +65,13 @@ narrative for tone and evidence before it goes out. See
   → Prioritization → Explainer → Output Reviewer (with a capped rewrite loop)
 
 ## Testing / Evaluation
-- **Held-out data:** 40% recall / 53% precision
-- **Tuned sample:** 75% recall / 50% precision
+
+- **Held-out data (never used for prompt calibration): 40% recall / 53% precision**
+
+This significantly exceeds the naive baseline rule (0.19% recall) and sits
+well above real-world AML precision benchmarks (5-10%, per PwC and
+peer-reviewed industry research). See `docs/architecture.md` for the full
+evaluation methodology.
 
 Both far exceed the naive baseline rule (0.19% recall) and sit well above
 real-world AML precision benchmarks (2-10%). See `docs/architecture.md`
