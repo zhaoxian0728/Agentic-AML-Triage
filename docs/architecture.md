@@ -44,14 +44,19 @@ flowchart TD
     D -->|false alarm| E[Close]
     D -->|confirmed| F[Prioritizer<br/>plain code]
     F --> G[Explainer Agent]
-    G --> H[Output Reviewer Agent]
-    H -->|pass| I[Investigator<br/>ranked shortlist + narrative]
+    G --> H[Output Reviewer Agent<br/>checks narrative wording,<br/>not the fraud verdict]
+    H -->|narrative passes| I[Investigator<br/>ranked shortlist + narrative]
     H -->|needs rewrite, 1x max| G
-    H -->|still failing| I
+    H -->|rewrite still fails| K[Narrative flagged:<br/>needs human wording check]
+    K --> I
 ```
 
 Output Reviewer can send the narrative back to the Explainer for
 ONE rewrite max, then flags for human review if still failing.
+
+Note: "human review" here refers to checking the narrative's wording and
+tone — the fraud verdict itself is decided earlier, by the Investigation
+Agent, and is never re-opened by the Output Reviewer.
 
 ## Key data finding: investigate the recipient, not the sender
 Analysis of PaySim showed money-mule accounts are defined by RECEIVING
