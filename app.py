@@ -4,7 +4,7 @@ import pandas as pd
 from src.features import engineer_features
 from src.detector import score_transaction
 from src.investigation_agent import build_investigation_agent
-from src.prioritization_agent import assign_ranks
+from prioritizer import assign_ranks
 from src.graph import build_graph
 from src.schemas import DetectorVerdict, InvestigationVerdict, ExplainerOutput, OutputReviewerVerdict
 
