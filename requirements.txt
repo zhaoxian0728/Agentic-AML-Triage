@@ -2,7 +2,6 @@ langgraph
 langchain
 boto3
 pydantic
-langsmith
 python-dotenv
 pandas
 scikit-learn
