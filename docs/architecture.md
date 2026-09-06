@@ -35,13 +35,20 @@ excluding these three types costs zero recall, since fraud cannot occur
 in them by the simulator's own design.
 
 ## Pipeline
-PaySim transactions -> Detector (plain code, not an agent) ->
-  [low score] -> Auto-close
-  [med/high score] -> Investigation Agent (reasoning loop, investigates
-    the RECIPIENT of the flagged transaction, not the sender)
-    -> [false alarm] -> Close
-    -> [confirmed] -> Prioritizer (plain code) -> Explainer Agent
-    -> Output Reviewer Agent -> Investigator (ranked shortlist + narrative)
+
+```mermaid
+flowchart TD
+    A[PaySim transactions] --> B[Detector<br/>plain code, not an agent]
+    B -->|low score| C[Auto-close]
+    B -->|med/high score| D[Investigation Agent<br/>investigates the RECIPIENT,<br/>not the sender]
+    D -->|false alarm| E[Close]
+    D -->|confirmed| F[Prioritizer<br/>plain code]
+    F --> G[Explainer Agent]
+    G --> H[Output Reviewer Agent]
+    H -->|pass| I[Investigator<br/>ranked shortlist + narrative]
+    H -->|needs rewrite, 1x max| G
+    H -->|still failing| I
+```
 
 Output Reviewer can send the narrative back to the Explainer for
 ONE rewrite max, then flags for human review if still failing.
